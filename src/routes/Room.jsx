@@ -2,12 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import './App.css'
 import { io } from 'socket.io-client';
 
-var SIGNALING_SERVER = "http://localhost:8080/";
+var SIGNALING_SERVER = "http://localhost:8080";
 var signaling_socket = io(SIGNALING_SERVER);
 // signaling_socket = io();
 
-function App() {
+function Room() {
 
+    const [users, setUsers] = useState({});        
     const videoRef = useRef(null);
     const anotherVideoRef = useRef(null);
 
@@ -279,10 +280,10 @@ function App() {
 
   return (
     <>
-        <video width="320" height="240" controls ref={videoRef}>
+        <video width="320" height="240" controls autoPlay ref={videoRef}>
             Your browser does not support the video tag.
         </video>
-        <video width="320" height="240" controls ref={anotherVideoRef}>
+        <video width="320" height="240" controls autoPlay ref={anotherVideoRef}>
             Your browser does not support the video tag.
         </video>
     </>
