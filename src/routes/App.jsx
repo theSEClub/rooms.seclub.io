@@ -30,7 +30,7 @@ export default function App() {
 
   return (
     <>
-      <div className='h-screen'>
+      <div className='h-screen main-background'>
 
         <Header />
 
@@ -50,7 +50,7 @@ export default function App() {
                   <span className="label-text text-secondary">Enter a username:</span>
                 </label>
                 <input type="text" placeholder="username" value={username} onChange={(e) => setUsername(e.target.value)} className="input input-bordered input-secondary w-full max-w-xs text-secondary" />
-                {error && 
+                {error &&
                   <label className="label">
                     <span className="label-text-alt text-error">{error}</span>
                   </label>
@@ -64,23 +64,23 @@ export default function App() {
           </div>
         </div>
 
-        <div className='flex flex-col items-center justify-center py-6 px-3'>
-
-          {entered &&
-            <div className='text-lg mb-6'>
-              Welcome to the SE Rooms, <span className='text-secondary'>{username}</span>!
-            </div>
-          }
-          <button onClick={() => setEntered(false)} className="btn btn-outline btn-secondary">Change username</button>
-
-        </div>
-
         {entered &&
-         <div className='flex items-center justify-center py-6 border-t border-base-200'>
-            <Rooms />
+          <div>
+
+            <div className='flex flex-col items-center justify-center py-6 px-3'>
+              <div className='text-lg mb-6'>
+                Welcome to the SE Rooms, <span className='text-secondary'>{username}</span>!
+              </div>
+              <button onClick={() => setEntered(false)} className="btn btn-outline btn-secondary">Change username</button>
+            </div>
+
+            <div className='flex items-center justify-center py-6 border-t border-base-200'>
+              <Rooms />
+            </div>
+            
           </div>
         }
-        
+
       </div>
     </>
   )

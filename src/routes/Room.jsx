@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import './App.css'
 import { io } from 'socket.io-client';
+import Header from '../components/Header';
+import { Link } from 'react-router-dom';
 
 var SIGNALING_SERVER = "http://localhost:8080";
 var signaling_socket = io(SIGNALING_SERVER);
-// signaling_socket = io();
 
 function Room() {
-
-    const [users, setUsers] = useState({});        
+      
     const videoRef = useRef(null);
     const anotherVideoRef = useRef(null);
 
@@ -27,7 +26,8 @@ function Room() {
 
     // var signaling_socket = null;   /* our socket.io connection to our webserver */
     var local_media_stream = null; /* our own microphone / webcam */
-    var peers = {};                /* keep track of our peer connections, indexed by peer_id (aka socket.io id) */
+    // var peers = {};                /* keep track of our peer connections, indexed by peer_id (aka socket.io id) */
+    const [peers, setPeers] = useState([]);                /* keep track of our peer connections, indexed by peer_id (aka socket.io id) */
     var peer_media_elements = {};  /* keep track of our <video>/<audio> tags, indexed by peer_id */
 
     function init() {
@@ -39,7 +39,7 @@ function Room() {
             setup_local_media(function() {
                 /* once the user has given us access to their
                 * microphone/camcorder, join the channel and start peering up */
-                join_chat_channel(DEFAULT_CHANNEL, {'whatever-you-want-here': 'stuff'});
+                join_chat_channel(DEFAULT_CHANNEL, {username: localStorage.getItem('username')});
                 // console.log('setting local media')
                 // signaling_socket.emit('join', {"channel": DEFAULT_CHANNEL, "userdata": {'whatever-you-want-here': 'stuff'}});
 
@@ -57,7 +57,7 @@ function Room() {
                 peers[peer_id].close();
             }
 
-            peers = {};
+            setPeers({});
             peer_media_elements = {};
         });
 
@@ -113,8 +113,9 @@ function Room() {
                 // peer_media_elements[peer_id] = remote_media;
                 // $('body').append(remote_media);
                 
-                // attachMediaStream(anotherVideoRef.current, event.streams[0]);
+                
                 anotherVideoRef.current.srcObject = event.streams[0];
+                // document.querySelector(`#${peer_id}-video`).srcObject = event.streams[0];
             }
 
             /* Add our local stream */
@@ -145,6 +146,10 @@ function Room() {
             }
         });
 
+
+        signaling_socket.on('printUser', function(config) {
+            console.log(config)
+        })
 
         /** 
          * Peers exchange session descriptions which contains information
@@ -255,7 +260,8 @@ function Room() {
             .then(function(stream) { /* user accepted access to a/v */
                 console.log("Access granted to audio/video");
                 local_media_stream = stream;
-                attachMediaStream(videoRef.current, stream);
+                // attachMediaStream(videoRef.current, stream);
+                document.querySelector('#local-video').srcObject = stream;
                 // videoRef.current.srcObject = stream;
                 
                 // var local_media = USE_VIDEO ? $("<video>") : $("<audio>");
@@ -276,18 +282,47 @@ function Room() {
 
     useEffect(()=>{
         init();
+        setPeers([
+            {username: "test", id: "test", stream: ""},
+            {username: "test", id: "test", stream: ""},
+        ]);
     }, [])
 
   return (
     <>
-        <video width="320" height="240" controls autoPlay ref={videoRef}>
-            Your browser does not support the video tag.
-        </video>
-        <video width="320" height="240" controls autoPlay ref={anotherVideoRef}>
-            Your browser does not support the video tag.
-        </video>
+        <Header />
+        <div className='flex flex-col items-center justify-center gap-6 w-full p-6'>
+            <div className='flex items-center justify-between w-1/2'>
+                <h1 className='text-center text-2xl'>Room</h1>
+                <Link to='/' tabIndex={'-1'}>
+                    <button className='btn btn-outline btn-secondary'>
+                        Leave Room
+                    </button>
+                </Link>
+            </div>
+            <div className='flex justify-center items-center flex-wrap gap-6'>
+                <div className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 rounded-lg'>
+                    <video id='local-video' className='rounded-lg w-80 h-60' controls autoPlay >
+                        Your browser does not support the video tag.
+                    </video>
+                    <div>
+                        <h2 className='text-center text-accent'>You</h2>
+                    </div>
+                </div>
+                {peers?.map((peer, index) => (
+                    <div key={index} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 rounded-lg'>
+                        <video id={`${peer.peer_id}-video`} className='rounded-lg w-80 h-60' controls autoPlay ref={videoRef}>
+                            Your browser does not support the video tag.
+                        </video>
+                        <div>
+                            <h2 className='text-center text-secondary'>{peer.username}</h2>
+                        </div>
+                    </div>
+                ))}
+            </div>  
+        </div>
     </>
   )
 }
 
-export default App
+export default Room
