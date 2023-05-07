@@ -2,12 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
-:root{
-    --primary: #8854ed;
-    --secondary: #63cecb;
-    --neutral: #141414;
-    --base-100: #FFFFFF;
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+        to bottom,
+        transparent,
+        rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
   }
+  
   
   *{
     margin: 0;

@@ -1,12 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
 import Header from '../components/Header';
-import { Link } from 'react-router-dom';
+import { Link, useLoaderData } from 'react-router-dom';
 
 var SIGNALING_SERVER = "http://localhost:8080";
 var signaling_socket = io(SIGNALING_SERVER);
 
+export async function loader({params}) {
+    const res = await fetch(`http://localhost:8000/rooms/${params.id}`);
+    const data = await res.json();
+    return data;
+}
+
 function Room() {
+    const room = useLoaderData();
       
     const videoRef = useRef(null);
     const anotherVideoRef = useRef(null);
@@ -281,6 +288,7 @@ function Room() {
 
 
     useEffect(()=>{
+        console.log("info:", {roomId: room.id, roomName: room.name, username: localStorage.getItem('username')});
         init();
         setPeers([
             {username: "test", id: "test", stream: ""},
@@ -293,25 +301,25 @@ function Room() {
         <Header />
         <div className='flex flex-col items-center justify-center gap-6 w-full p-6'>
             <div className='flex items-center justify-between w-1/2'>
-                <h1 className='text-center text-2xl'>Room</h1>
+                <h1 className='text-center text-2xl'>{room.name}</h1>
                 <Link to='/' tabIndex={'-1'}>
-                    <button className='btn btn-outline btn-secondary'>
+                    <button className='btn btn-outline btn-secondary text-primary-content'>
                         Leave Room
                     </button>
                 </Link>
             </div>
             <div className='flex justify-center items-center flex-wrap gap-6'>
-                <div className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 rounded-lg'>
-                    <video id='local-video' className='rounded-lg w-80 h-60' controls autoPlay >
+                <div className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
+                    <video id='local-video' className=' w-80 h-60' controls autoPlay >
                         Your browser does not support the video tag.
                     </video>
                     <div>
-                        <h2 className='text-center text-accent'>You</h2>
+                        <h2 className='text-center text-info'>You</h2>
                     </div>
                 </div>
                 {peers?.map((peer, index) => (
-                    <div key={index} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 rounded-lg'>
-                        <video id={`${peer.peer_id}-video`} className='rounded-lg w-80 h-60' controls autoPlay ref={videoRef}>
+                    <div key={index} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
+                        <video id={`${peer.peer_id}-video`} className=' w-80 h-60' controls autoPlay ref={videoRef}>
                             Your browser does not support the video tag.
                         </video>
                         <div>
