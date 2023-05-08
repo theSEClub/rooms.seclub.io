@@ -5,6 +5,8 @@ import Index from './index'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
 
-    <Index />
+  <>
+    <h1>hello </h1>
+  </>
 
 )
