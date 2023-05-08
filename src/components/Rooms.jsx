@@ -20,7 +20,7 @@ export default function Rooms() {
     }, [newRoom])
 
     async function fetchRooms() {
-        const res = await fetch('http://localhost:8000/rooms');
+        const res = await fetch('http://localhost:3000/api/v1/rooms');
         const data = await res.json();
         setRooms(data);
     };
@@ -50,7 +50,7 @@ export default function Rooms() {
     };    
     
     async function addRoom(roomName) {
-        const res = await fetch('http://localhost:8000/rooms', {
+        const res = await fetch('http://localhost:3000/api/v1/rooms', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: roomName })
@@ -82,7 +82,7 @@ export default function Rooms() {
             rooms?.map(room => {
                 return (
                     <div key={room.id} className='flex justify-between items-center gap-3 mb-6 py-3 px-8 border border-base-300 max-sm:flex-col'>
-                        <h2 className='text-base'>{room.name}</h2>
+                        <h2 className='text-base'>{room.id}</h2>
                         <Link to={`/room/${room.id}`} tabIndex={'-1'}>
                             <button className="btn btn-outline btn-secondary">
                                 Join Room

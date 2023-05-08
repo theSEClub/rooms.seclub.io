@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
 import { Link, useLoaderData } from 'react-router-dom';
 
-var SIGNALING_SERVER = "http://localhost:8080";
+var SIGNALING_SERVER = "http://localhost:3000";
 var signaling_socket = io(SIGNALING_SERVER);
 
 export async function loader({params}) {
-    const res = await fetch(`http://localhost:8000/rooms/${params.id}`);
+    const res = await fetch(`http://localhost:3000/api/v1/rooms/${params.id}`);
     const data = await res.json();
     return data;
 }
