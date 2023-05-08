@@ -12,7 +12,10 @@ body {
     rgb(var(--background-start-rgb));
   }
   
-  
+[data-theme] {
+  background: none;
+}
+
   *{
     margin: 0;
     padding: 0;

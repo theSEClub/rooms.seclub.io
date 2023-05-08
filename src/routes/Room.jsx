@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
-import Header from '../components/Header';
 import { Link, useLoaderData } from 'react-router-dom';
 
 var SIGNALING_SERVER = "http://localhost:8080";
@@ -13,6 +12,7 @@ export async function loader({params}) {
 }
 
 function Room() {
+    
     const room = useLoaderData();
       
     const videoRef = useRef(null);
@@ -298,7 +298,6 @@ function Room() {
 
   return (
     <>
-        <Header />
         <div className='flex flex-col items-center justify-center gap-6 w-full p-6'>
             <div className='flex items-center justify-between w-1/2'>
                 <h1 className='text-center text-2xl'>{room.name}</h1>
