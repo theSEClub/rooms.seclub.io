@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
 import { Link, useLoaderData, useParams } from 'react-router-dom';
 
-var SIGNALING_SERVER = "wss://192.168.46.96:3000";
+var SIGNALING_SERVER = "wss://api.room.seclub.io:3000";
 // var signaling_socket = io(SIGNALING_SERVER);
 
 function Room() {
@@ -63,6 +63,7 @@ function Room() {
         });
 
         function join_chat_channel(channel, userdata) {
+            console.log("join", oom.id, localStorage.getItem('username'));
             signaling_socket.emit('join', {"room_id": room.id, "username": localStorage.getItem('username')});
         }
         function part_chat_channel(channel) {
@@ -248,17 +249,17 @@ function Room() {
         console.log("Requesting access to local audio / video inputs");
 
 
-        navigator.getUserMedia = ( navigator.getUserMedia ||
-                navigator.webkitGetUserMedia ||
-                navigator.mozGetUserMedia ||
-                navigator.msGetUserMedia);
+        window.navigator.getUserMedia = ( window.navigator.getUserMedia ||
+                window.navigator.webkitGetUserMedia ||
+                window.navigator.mozGetUserMedia ||
+                window.navigator.msGetUserMedia);
 
         function attachMediaStream(element, stream) {
             console.log('DEPRECATED, attachMediaStream will soon be removed.');
             element.srcObject = stream;
             };
 
-        navigator.mediaDevices.getUserMedia({"audio": USE_AUDIO, "video": USE_VIDEO})
+        window.navigator.mediaDevices.getUserMedia({"audio": USE_AUDIO, "video": USE_VIDEO})
             .then(function(stream) { /* user accepted access to a/v */
                 console.log("Access granted to audio/video");
                 local_media_stream = stream;
@@ -312,7 +313,7 @@ function Room() {
                     </div>
                 </div>
                 {peers?.map((peer, index) => (
-                    <div key={index} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
+                    <div key={`${index}123`} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
                         <video id={`${peer.peer_id}-video`} className=' w-80 h-60' controls autoPlay ref={anotherVideoRef}>
                             Your browser does not support the video tag.
                         </video>

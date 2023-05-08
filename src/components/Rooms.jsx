@@ -22,7 +22,7 @@ export default function Rooms() {
     }, [])
 
     async function fetchRooms() {
-        const res = await fetch('https://192.168.46.96:3000/api/v1/rooms');
+        const res = await fetch('https://api.room.seclub.io:3000/api/v1/rooms');
         const data = await res.json();
         setRooms(data);
     };
