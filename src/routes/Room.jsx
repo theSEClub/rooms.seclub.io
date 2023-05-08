@@ -15,7 +15,7 @@ function Room() {
     
     const room = useLoaderData();
       
-    const videoRef = useRef(null);
+    // this ref is temprorary for testing
     const anotherVideoRef = useRef(null);
 
     /** CONFIG **/
@@ -318,7 +318,7 @@ function Room() {
                 </div>
                 {peers?.map((peer, index) => (
                     <div key={index} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
-                        <video id={`${peer.peer_id}-video`} className=' w-80 h-60' controls autoPlay ref={videoRef}>
+                        <video id={`${peer.peer_id}-video`} className=' w-80 h-60' controls autoPlay ref={anotherVideoRef}>
                             Your browser does not support the video tag.
                         </video>
                         <div>
