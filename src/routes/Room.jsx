@@ -1,21 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
-import Header from '../components/Header';
-import { Link, useLoaderData } from 'react-router-dom';
+import { Link, useLoaderData, useParams } from 'react-router-dom';
 
-var SIGNALING_SERVER = "http://localhost:8080";
-var signaling_socket = io(SIGNALING_SERVER);
-
-export async function loader({params}) {
-    const res = await fetch(`http://localhost:8000/rooms/${params.id}`);
-    const data = await res.json();
-    return data;
-}
+var SIGNALING_SERVER = "wss://192.168.46.96:3000";
+// var signaling_socket = io(SIGNALING_SERVER);
 
 function Room() {
-    const room = useLoaderData();
-      
-    const videoRef = useRef(null);
+    
+    const {id} = useParams();
+    const room = id;
+    // this ref is temprorary for testing
     const anotherVideoRef = useRef(null);
 
     /** CONFIG **/
@@ -39,7 +33,7 @@ function Room() {
 
     function init() {
         console.log("Connecting to signaling server");
-        // signaling_socket = io();
+        let signaling_socket = io(SIGNALING_SERVER);
 
         signaling_socket.on('connect', function() {
             console.log("Connected to signaling server");
@@ -69,7 +63,7 @@ function Room() {
         });
 
         function join_chat_channel(channel, userdata) {
-            signaling_socket.emit('join', {"channel": channel, "userdata": userdata});
+            signaling_socket.emit('join', {"room_id": room.id, "username": localStorage.getItem('username')});
         }
         function part_chat_channel(channel) {
             signaling_socket.emit('part', channel);
@@ -90,13 +84,14 @@ function Room() {
                 console.log("Already connected to peer ", peer_id);
                 return;
             }
+            var username = config.username;
             var peer_connection = new RTCPeerConnection(
                 {"iceServers": ICE_SERVERS},
                 {"optional": [{"DtlsSrtpKeyAgreement": true}]} /* this will no longer be needed by chrome
                                                                 * eventually (supposedly), but is necessary 
                                                                 * for now to get firefox to talk to chrome */
             );
-            peers[peer_id] = peer_connection;
+            peers[peer_id] = {username, peer_connection};
 
             peer_connection.onicecandidate = function(event) {
                 if (event.candidate) {
@@ -167,7 +162,7 @@ function Room() {
         signaling_socket.on('sessionDescription', function(config) {
             console.log('Remote description received: ', config);
             var peer_id = config.peer_id;
-            var peer = peers[peer_id];
+            var peer = peers[peer_id].peer_connection;
             var remote_description = config.session_description;
             console.log(config.session_description);
 
@@ -208,7 +203,7 @@ function Room() {
          * can begin trying to find the best path to one another on the net.
          */
         signaling_socket.on('iceCandidate', function(config) {
-            var peer = peers[config.peer_id];
+            var peer = peers[config.peer_id].peer_connection;
             var ice_candidate = config.ice_candidate;
             console.log("adding ice candidate")
             peer.addIceCandidate(new RTCIceCandidate(ice_candidate));
@@ -232,7 +227,7 @@ function Room() {
                 peer_media_elements[peer_id].remove();
             }
             if (peer_id in peers) {
-                peers[peer_id].close();
+                peers[peer_id].peer_connection.close();
             }
 
             delete peers[peer_id];
@@ -291,17 +286,16 @@ function Room() {
         console.log("info:", {roomId: room.id, roomName: room.name, username: localStorage.getItem('username')});
         init();
         setPeers([
-            {username: "test", id: "test", stream: ""},
-            {username: "test", id: "test", stream: ""},
+            // {username: "test", id: "test", stream: ""},
+            // {username: "test", id: "test", stream: ""},
         ]);
     }, [])
 
   return (
     <>
-        <Header />
         <div className='flex flex-col items-center justify-center gap-6 w-full p-6'>
             <div className='flex items-center justify-between w-1/2'>
-                <h1 className='text-center text-2xl'>{room.name}</h1>
+                <h1 className='text-center text-2xl'>{room.id}</h1>
                 <Link to='/' tabIndex={'-1'}>
                     <button className='btn btn-outline btn-secondary text-primary-content'>
                         Leave Room
@@ -319,7 +313,7 @@ function Room() {
                 </div>
                 {peers?.map((peer, index) => (
                     <div key={index} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
-                        <video id={`${peer.peer_id}-video`} className=' w-80 h-60' controls autoPlay ref={videoRef}>
+                        <video id={`${peer.peer_id}-video`} className=' w-80 h-60' controls autoPlay ref={anotherVideoRef}>
                             Your browser does not support the video tag.
                         </video>
                         <div>

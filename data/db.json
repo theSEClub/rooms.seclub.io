@@ -1,0 +1,16 @@
+{
+  "rooms": [
+    {
+      "id": "1",
+      "name": "Room 1"
+    },
+    {
+      "id": "2",
+      "name": "Room 2"
+    },
+    {
+      "name": "last one",
+      "id": "2v0v7fX"
+    }
+  ]
+}
