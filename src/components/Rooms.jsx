@@ -20,7 +20,7 @@ export default function Rooms() {
     }, [newRoom])
 
     async function fetchRooms() {
-        const res = await fetch('http://localhost:3000/api/v1/rooms');
+        const res = await fetch('https://localhost:3000/api/v1/rooms');
         const data = await res.json();
         setRooms(data);
     };
@@ -50,12 +50,13 @@ export default function Rooms() {
     };    
     
     async function addRoom(roomName) {
-        const res = await fetch('http://localhost:3000/api/v1/rooms', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: roomName })
-        });
-        return res;
+        // const res = await fetch('http://localhost:3000/api/v1/rooms', {
+        //     method: 'POST',
+        //     headers: { 'Content-Type': 'application/json' },
+        //     body: JSON.stringify({ name: roomName })
+        // });
+        // return res;
+        return { ok: true };
     };
 
 

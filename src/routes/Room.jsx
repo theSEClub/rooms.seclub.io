@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
 import { Link, useLoaderData } from 'react-router-dom';
 
-var SIGNALING_SERVER = "http://localhost:3000";
-var signaling_socket = io(SIGNALING_SERVER);
+var SIGNALING_SERVER = "wss://localhost:3000";
+// var signaling_socket = io(SIGNALING_SERVER);
 
 export async function loader({params}) {
     const res = await fetch(`http://localhost:3000/api/v1/rooms/${params.id}`);
@@ -39,7 +39,7 @@ function Room() {
 
     function init() {
         console.log("Connecting to signaling server");
-        // signaling_socket = io();
+        let signaling_socket = io(SIGNALING_SERVER);
 
         signaling_socket.on('connect', function() {
             console.log("Connected to signaling server");
@@ -69,7 +69,7 @@ function Room() {
         });
 
         function join_chat_channel(channel, userdata) {
-            signaling_socket.emit('join', {"channel": channel, "userdata": userdata});
+            signaling_socket.emit('join', {"room_id": "hello", "username": "testss"});
         }
         function part_chat_channel(channel) {
             signaling_socket.emit('part', channel);
@@ -291,8 +291,8 @@ function Room() {
         console.log("info:", {roomId: room.id, roomName: room.name, username: localStorage.getItem('username')});
         init();
         setPeers([
-            {username: "test", id: "test", stream: ""},
-            {username: "test", id: "test", stream: ""},
+            // {username: "test", id: "test", stream: ""},
+            // {username: "test", id: "test", stream: ""},
         ]);
     }, [])
 
@@ -300,7 +300,7 @@ function Room() {
     <>
         <div className='flex flex-col items-center justify-center gap-6 w-full p-6'>
             <div className='flex items-center justify-between w-1/2'>
-                <h1 className='text-center text-2xl'>{room.name}</h1>
+                <h1 className='text-center text-2xl'>{room.id}</h1>
                 <Link to='/' tabIndex={'-1'}>
                     <button className='btn btn-outline btn-secondary text-primary-content'>
                         Leave Room
