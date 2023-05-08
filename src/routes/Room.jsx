@@ -1,20 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
-import { Link, useLoaderData } from 'react-router-dom';
+import { Link, useLoaderData, useParams } from 'react-router-dom';
 
-var SIGNALING_SERVER = "wss://localhost:3000";
+var SIGNALING_SERVER = "wss://192.168.46.96:3000";
 // var signaling_socket = io(SIGNALING_SERVER);
-
-export async function loader({params}) {
-    const res = await fetch(`http://localhost:3000/api/v1/rooms/${params.id}`);
-    const data = await res.json();
-    return data;
-}
 
 function Room() {
     
-    const room = useLoaderData();
-      
+    const {id} = useParams();
+    const room = id;
     // this ref is temprorary for testing
     const anotherVideoRef = useRef(null);
 
@@ -69,7 +63,7 @@ function Room() {
         });
 
         function join_chat_channel(channel, userdata) {
-            signaling_socket.emit('join', {"room_id": "hello", "username": "testss"});
+            signaling_socket.emit('join', {"room_id": room.id, "username": localStorage.getItem('username')});
         }
         function part_chat_channel(channel) {
             signaling_socket.emit('part', channel);
@@ -90,13 +84,14 @@ function Room() {
                 console.log("Already connected to peer ", peer_id);
                 return;
             }
+            var username = config.username;
             var peer_connection = new RTCPeerConnection(
                 {"iceServers": ICE_SERVERS},
                 {"optional": [{"DtlsSrtpKeyAgreement": true}]} /* this will no longer be needed by chrome
                                                                 * eventually (supposedly), but is necessary 
                                                                 * for now to get firefox to talk to chrome */
             );
-            peers[peer_id] = peer_connection;
+            peers[peer_id] = {username, peer_connection};
 
             peer_connection.onicecandidate = function(event) {
                 if (event.candidate) {
@@ -167,7 +162,7 @@ function Room() {
         signaling_socket.on('sessionDescription', function(config) {
             console.log('Remote description received: ', config);
             var peer_id = config.peer_id;
-            var peer = peers[peer_id];
+            var peer = peers[peer_id].peer_connection;
             var remote_description = config.session_description;
             console.log(config.session_description);
 
@@ -208,7 +203,7 @@ function Room() {
          * can begin trying to find the best path to one another on the net.
          */
         signaling_socket.on('iceCandidate', function(config) {
-            var peer = peers[config.peer_id];
+            var peer = peers[config.peer_id].peer_connection;
             var ice_candidate = config.ice_candidate;
             console.log("adding ice candidate")
             peer.addIceCandidate(new RTCIceCandidate(ice_candidate));
@@ -232,7 +227,7 @@ function Room() {
                 peer_media_elements[peer_id].remove();
             }
             if (peer_id in peers) {
-                peers[peer_id].close();
+                peers[peer_id].peer_connection.close();
             }
 
             delete peers[peer_id];

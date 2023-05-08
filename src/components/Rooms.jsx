@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom';
+import { Link, redirect, useNavigate } from 'react-router-dom';
 import { checkLocalStorage } from '../helpers/helper';
 import Modal from './Modal';
 
 
 export default function Rooms() {
+
+    const navigate = useNavigate();
 
     const [rooms, setRooms] = useState([]);
     const [newRoom, setNewRoom] = useState();
@@ -17,10 +19,10 @@ export default function Rooms() {
 
     useEffect(() => {
         fetchRooms();
-    }, [newRoom])
+    }, [])
 
     async function fetchRooms() {
-        const res = await fetch('https://localhost:3000/api/v1/rooms');
+        const res = await fetch('https://192.168.46.96:3000/api/v1/rooms');
         const data = await res.json();
         setRooms(data);
     };
@@ -36,28 +38,34 @@ export default function Rooms() {
             return;
         }
         setLoading(true);
-        const res = await addRoom(roomName);
-        console.log(res);
-        if (!res.ok) {
-                setError('Error adding room')
-                return; 
-        }          
+        // const res = await addRoom(roomName);
+        // console.log(res);
+        // if (!res.ok) {
+        //         setError('Error adding room')
+        //         return; 
+        // }          
         setError('');
         setLoading(false);
+        console.log('roomName', roomName);
+
         setNewRoom(roomName);
+        navigate(`/room/${roomName}`);
+        console.log('roomName', roomName);
+
         setRoomName('');
         closeRoomModalRef.current.click();
     };    
     
-    async function addRoom(roomName) {
-        // const res = await fetch('http://localhost:3000/api/v1/rooms', {
-        //     method: 'POST',
-        //     headers: { 'Content-Type': 'application/json' },
-        //     body: JSON.stringify({ name: roomName })
-        // });
-        // return res;
-        return { ok: true };
-    };
+    // async function addRoom(roomName) {
+    //     // const res = await fetch('http://localhost:3000/api/v1/rooms', {
+    //     //     method: 'POST',
+    //     //     headers: { 'Content-Type': 'application/json' },
+    //     //     body: JSON.stringify({ name: roomName })
+    //     // });
+    //     // return res;
+        
+    //     return { ok: true };
+    // };
 
 
 
