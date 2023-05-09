@@ -111,10 +111,10 @@ function Room() {
             peersList[peer_id] = peerItem;
             setPeers(peersList);
 
-
+            console.log("adding peers: peer id", peer_id)
             console.log("adding peers: peers:- ", peers)
-            peers.forEach((index, peer) => {
-                console.log(index, peer)
+            peers.forEach(index => {
+                console.log(index)
             });
 
 
