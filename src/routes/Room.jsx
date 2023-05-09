@@ -113,6 +113,9 @@ function Room() {
 
 
             console.log("adding peers: peers:- ", peers)
+            peers.forEach((index, peer) => {
+                console.log(index, peer)
+            });
 
 
             peer_connection.onicecandidate = function (event) {
