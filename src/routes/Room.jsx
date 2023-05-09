@@ -288,6 +288,9 @@ function Room() {
         console.log("useEffect: room:- ", room)
         init();
         console.log("useEffect: peers:- ", peers)
+        peers.forEach((index, peer) => {
+            console.log(index, peer)
+        });
     }, [])
 
 
