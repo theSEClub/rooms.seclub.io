@@ -3,12 +3,11 @@ import { io } from 'socket.io-client';
 import { Link, useParams } from 'react-router-dom';
 
 var SIGNALING_SERVER = "wss://api.room.seclub.io:3000";
-// var signaling_socket = io(SIGNALING_SERVER);
 
 function Room() {
-    
+
     // get room id from url
-    const {id} = useParams();
+    const { id } = useParams();
     const room = id;
 
     /** CONFIG **/
@@ -20,32 +19,31 @@ function Room() {
     // stun server
     /** Also see: https://gist.github.com/zziuni/3741933 **/
     var ICE_SERVERS = [
-        {urls:"stun:stun.l.google.com:19302"}
+        { urls: "stun:stun.l.google.com:19302" }
     ];
-    
+
     /* our own microphone / webcam */
-    var local_media_stream = null; 
+    const [local_media_stream, setLocalMediaStream] = useState(null);
 
     /* keep track of our peer connections, indexed by peer_id (aka socket.io id) */
-    const [peers, setPeers] = useState([]);                
+    const [peers, setPeers] = useState([]);
+
 
     function init() {
         console.log("Connecting to signaling server");
         let signaling_socket = io(SIGNALING_SERVER);
 
-        signaling_socket.on('connect', function() {
+        signaling_socket.on('connect', function () {
             console.log("Connected to signaling server");
-            setup_local_media(function() {
-                /* once the user has given us access to their
-                * microphone/camcorder, join the channel and start peering up */
-                join_chat_channel(DEFAULT_CHANNEL, {username: localStorage.getItem('username')});
-                // console.log('setting local media')
-                // signaling_socket.emit('join', {"channel": DEFAULT_CHANNEL, "userdata": {'whatever-you-want-here': 'stuff'}});
+            setup_local_media(function () {
+
+                // once the user has given us access to their media => join the channel and start peering up 
+                join_chat_channel(room, localStorage.getItem('username'));
 
             });
         });
 
-        signaling_socket.on('disconnect', function() {
+        signaling_socket.on('disconnect', function () {
             console.log("Disconnected from signaling server");
             /* Tear down all of our peer connections and remove all the
             * media divs when we disconnect */
@@ -61,8 +59,8 @@ function Room() {
         });
 
         function join_chat_channel(channel, userdata) {
-            console.log("join", room, localStorage.getItem('username'));
-            signaling_socket.emit('join', {"room_id": room, "username": localStorage.getItem('username')});
+            console.log("joining: ", { channel, userdata });
+            signaling_socket.emit('join', { channel, userdata });
         }
         function part_chat_channel(channel) {
             signaling_socket.emit('part', channel);
@@ -71,31 +69,42 @@ function Room() {
 
         /** 
         * When we join a group, our signaling server will send out 'addPeer' events to each pair
-        * of users in the group (creating a fully-connected graph of users, ie if there are 6 people
+        * of users in the group (creating a fully-connected graph of users, i.e. if there are 6 people
         * in the channel you will connect directly to the other 5, so there will be a total of 15 
         * connections in the network). 
         */
-        signaling_socket.on('addPeer', function(config) {
+        signaling_socket.on('addPeer', function (config) {
             console.log('Signaling server said to add peer:', config);
+
             var peer_id = config.peer_id;
+            var username = config.username;
+
             if (peer_id in peers) {
                 /* This could happen if the user joins multiple channels where the other peer is also in. */
                 console.log("Already connected to peer ", peer_id);
                 return;
             }
-            var username = config.username;
-            var peer_connection = new RTCPeerConnection(
-                {"iceServers": ICE_SERVERS},
-                {"optional": [{"DtlsSrtpKeyAgreement": true}]} /* this will no longer be needed by chrome
-                                                                * eventually (supposedly), but is necessary 
-                                                                * for now to get firefox to talk to chrome */
-            );
-            peers[peer_id] = {username, peer_connection};
 
-            peer_connection.onicecandidate = function(event) {
+            var peer_connection = new RTCPeerConnection(
+                { "iceServers": ICE_SERVERS },
+                { "optional": [{ "DtlsSrtpKeyAgreement": true }] } 
+                // this will no longer be needed by chrome eventually (supposedly),
+                // but is necessary for now to get firefox to talk to chrome .
+            );
+
+            setPeers(peers => (
+                {
+                    ...peers, [peer_id]: {
+                        username: username,
+                        peer_connection: peer_connection
+                    }
+                }
+            ));
+
+            peer_connection.onicecandidate = function (event) {
                 if (event.candidate) {
                     signaling_socket.emit('relayICECandidate', {
-                        'peer_id': peer_id, 
+                        'peer_id': peer_id,
                         'ice_candidate': {
                             'sdpMLineIndex': event.candidate.sdpMLineIndex,
                             'candidate': event.candidate.candidate
@@ -103,19 +112,9 @@ function Room() {
                     });
                 }
             }
-            peer_connection.ontrack = function(event) {
+
+            peer_connection.ontrack = function (event) {
                 console.log("ontrack", event);
-                // var remote_media = USE_VIDEO ? $("<video>") : $("<audio>");
-                // remote_media.attr("autoplay", "autoplay");
-                // if (MUTE_AUDIO_BY_DEFAULT) {
-                //     remote_media.attr("muted", "true");
-                // }
-                // remote_media.attr("controls", "");
-                // peer_media_elements[peer_id] = remote_media;
-                // $('body').append(remote_media);
-                
-                
-                // anotherVideoRef.current.srcObject = event.streams[0];
                 document.querySelector(`#${peer_id}-video`).srcObject = event.streams[0];
             }
 
@@ -130,15 +129,15 @@ function Room() {
             if (config.should_create_offer) {
                 console.log("Creating RTC offer to ", peer_id);
                 peer_connection.createOffer(
-                    function (local_description) { 
+                    function (local_description) {
                         console.log("Local offer description is: ", local_description);
                         peer_connection.setLocalDescription(local_description,
-                            function() { 
-                                signaling_socket.emit('relaySessionDescription', 
-                                    {'peer_id': peer_id, 'session_description': local_description});
-                                console.log("Offer setLocalDescription succeeded"); 
+                            function () {
+                                signaling_socket.emit('relaySessionDescription',
+                                    { 'peer_id': peer_id, 'session_description': local_description });
+                                console.log("Offer setLocalDescription succeeded");
                             },
-                            function() { Alert("Offer setLocalDescription failed!"); }
+                            function () { Alert("Offer setLocalDescription failed!"); }
                         );
                     },
                     function (error) {
@@ -147,52 +146,50 @@ function Room() {
             }
         });
 
-
-        signaling_socket.on('printUser', function(config) {
-            console.log(config)
-        })
-
         /** 
          * Peers exchange session descriptions which contains information
          * about their audio / video settings and that sort of stuff. First
          * the 'offerer' sends a description to the 'answerer' (with type
          * "offer"), then the answerer sends one back (with type "answer").  
          */
-        signaling_socket.on('sessionDescription', function(config) {
+        signaling_socket.on('sessionDescription', function (config) {
             console.log('Remote description received: ', config);
             var peer_id = config.peer_id;
             var peer = peers[peer_id].peer_connection;
             var remote_description = config.session_description;
-            console.log(config.session_description);
 
+            console.log(config.session_description);
             var desc = new RTCSessionDescription(remote_description);
-            var stuff = peer.setRemoteDescription(desc, 
-                function() {
+
+            var stuff = peer.setRemoteDescription(desc,
+                function () {
                     console.log("setRemoteDescription succeeded");
                     if (remote_description.type == "offer") {
                         console.log("Creating answer");
                         peer.createAnswer(
-                            function(local_description) {
+                            function (local_description) {
                                 console.log("Answer description is: ", local_description);
                                 peer.setLocalDescription(local_description,
-                                    function() { 
-                                        signaling_socket.emit('relaySessionDescription', 
-                                            {'peer_id': peer_id, 'session_description': local_description});
+                                    function () {
+                                        signaling_socket.emit('relaySessionDescription',
+                                            { 'peer_id': peer_id, 'session_description': local_description });
                                         console.log("Answer setLocalDescription succeeded");
                                     },
-                                    function() { console.log("Answer setLocalDescription failed!"); }
+                                    function () { console.log("Answer setLocalDescription failed!"); }
                                 );
                             },
-                            function(error) {
+                            function (error) {
                                 console.log("Error creating answer: ", error);
                                 console.log(peer);
-                            });
+                            }
+                        );
                     }
                 },
-                function(error) {
+                function (error) {
                     console.log("setRemoteDescription error: ", error);
                 }
             );
+
             console.log("Description Object: ", desc);
 
         });
@@ -201,7 +198,7 @@ function Room() {
          * The offerer will send a number of ICE Candidate blobs to the answerer so they 
          * can begin trying to find the best path to one another on the net.
          */
-        signaling_socket.on('iceCandidate', function(config) {
+        signaling_socket.on('iceCandidate', function (config) {
             var peer = peers[config.peer_id].peer_connection;
             var ice_candidate = config.ice_candidate;
             console.log("adding ice candidate")
@@ -219,108 +216,100 @@ function Room() {
          * signaling_socket.on('disconnect') code will kick in and tear down
          * all the peer sessions.
          */
-        signaling_socket.on('removePeer', function(config) {
+        signaling_socket.on('removePeer', function (config) {
             console.log('Signaling server said to remove peer:', config);
             var peer_id = config.peer_id;
-            if (peer_id in peer_media_elements) {
-                peer_media_elements[peer_id].remove();
-            }
             if (peer_id in peers) {
                 peers[peer_id].peer_connection.close();
             }
 
-            delete peers[peer_id];
-            delete peer_media_elements[config.peer_id];
+            // remove peer from list
+            setPeers(peers => {
+                peers.filter(index => index !== peer_id)
+            });
+
+            // delete peers[peer_id];
+            // delete peer_media_elements[config.peer_id];
+
         });
     }
 
-    /***********************/
-    /** Local media stuff **/
-    /***********************/
+    /****************************************/
+    /** Setting Local Media (getUserMedia) **/
+    /****************************************/
     function setup_local_media(callback, errorback) {
-        if (local_media_stream != null) {  /* ie, if we've already been initialized */
+        /* ie, if we've already been initialized */
+        if (local_media_stream != null) {
             if (callback) callback();
-            return; 
+            return;
         }
-        /* Ask user for permission to use the computers microphone and/or camera, 
-            * attach it to an <audio> or <video> tag if they give us access. */
+
+        // Ask user for permission to use the computers microphone and/or camera 
         console.log("Requesting access to local audio / video inputs");
 
+        window.navigator.getUserMedia = (
+            window.navigator.getUserMedia ||
+            window.navigator.webkitGetUserMedia ||
+            window.navigator.mozGetUserMedia ||
+            window.navigator.msGetUserMedia
+        );
 
-        window.navigator.getUserMedia = ( window.navigator.getUserMedia ||
-                window.navigator.webkitGetUserMedia ||
-                window.navigator.mozGetUserMedia ||
-                window.navigator.msGetUserMedia);
-
-        function attachMediaStream(element, stream) {
-            console.log('DEPRECATED, attachMediaStream will soon be removed.');
-            element.srcObject = stream;
-            };
-
-        window.navigator.mediaDevices.getUserMedia({"audio": USE_AUDIO, "video": USE_VIDEO})
-            .then(function(stream) { /* user accepted access to a/v */
+        window.navigator.mediaDevices.getUserMedia({ "audio": USE_AUDIO, "video": USE_VIDEO })
+            .then(function (stream) { 
                 console.log("Access granted to audio/video");
-                local_media_stream = stream;
-                // attachMediaStream(videoRef.current, stream);
+                setLocalMediaStream(stream);
                 document.querySelector('#local-video').srcObject = stream;
-                // videoRef.current.srcObject = stream;
-                
-                // var local_media = USE_VIDEO ? $("<video>") : $("<audio>");
-                // local_media.attr("autoplay", "autoplay");
-                // local_media.attr("muted", "true"); /* always mute ourselves by default */
-                // local_media.attr("controls", "");
-                // $('body').append(local_media);
-                // attachMediaStream(local_media[0], stream);
+
                 if (callback) callback();
             })
-            // .catch(function() { /* user denied access to a/v */
-            //     console.log("Access denied for audio/video");
-            //     alert("You chose not to provide access to the camera/microphone, demo will not work.");
-            //     if (errorback) errorback();
-            // })
+            .catch(function () {
+                console.log("Access denied for audio/video");
+                alert("You chose not to provide access to the camera/microphone, join is denied.");
+                if (errorback) errorback();
+            })
     }
 
 
-    useEffect(()=>{
-        console.log(room)
+    useEffect(() => {
+        console.log("useEffect: room:- ", room)
         init();
-        console.log(peers)
+        console.log("useEffect: peers:- ", peers)
     }, [])
 
-  return (
-    <>
-        <div className='flex flex-col items-center justify-center gap-6 w-full p-6'>
-            <div className='flex items-center justify-between w-1/2'>
-                <h1 className='text-center text-2xl'>{room}</h1>
-                <Link to='/' tabIndex={'-1'}>
-                    <button className='btn btn-outline btn-secondary text-primary-content'>
-                        Leave Room
-                    </button>
-                </Link>
-            </div>
-            <div className='flex justify-center items-center flex-wrap gap-6'>
-                <div className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
-                    <video id='local-video' className=' w-80 h-60' controls autoPlay >
-                        Your browser does not support the video tag.
-                    </video>
-                    <div>
-                        <h2 className='text-center text-info'>You</h2>
-                    </div>
+    return (
+        <>
+            <div className='flex flex-col items-center justify-center gap-6 w-full p-6'>
+                <div className='flex items-center justify-between w-1/2'>
+                    <h1 className='text-center text-2xl'>{room}</h1>
+                    <Link to='/' tabIndex={'-1'}>
+                        <button className='btn btn-outline btn-secondary text-primary-content'>
+                            Leave Room
+                        </button>
+                    </Link>
                 </div>
-                {peers?.map((peer, index) => (
-                    <div key={`${index}123`} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
-                        <video id={`${peer.peer_id}-video`} className=' w-80 h-60' controls autoPlay>
+                <div className='flex justify-center items-center flex-wrap gap-6'>
+                    <div className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
+                        <video id='local-video' className=' w-80 h-60' controls autoPlay muted >
                             Your browser does not support the video tag.
                         </video>
                         <div>
-                            <h2 className='text-center text-secondary'>{peer.username}</h2>
+                            <h2 className='text-center text-info'>You</h2>
                         </div>
                     </div>
-                ))}
-            </div>  
-        </div>
-    </>
-  )
+                    {peers?.map((peer, index) => (
+                        <div key={`${index}123`} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
+                            <video id={`${index}-video`} className=' w-80 h-60' controls autoPlay>
+                                Your browser does not support the video tag.
+                            </video>
+                            <div>
+                                <h2 className='text-center text-secondary'>{peer.username}</h2>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </>
+    )
 }
 
 export default Room
