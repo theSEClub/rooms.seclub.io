@@ -23,7 +23,7 @@ function Room() {
     ];
 
     /* our own microphone / webcam */
-    const [local_media_stream, setLocalMediaStream] = useState(null);
+    var local_media_stream = null;
 
     /* keep track of our peer connections, indexed by peer_id (aka socket.io id) */
     const [peers, setPeers] = useState([]);
@@ -79,11 +79,13 @@ function Room() {
             var peer_id = config.peer_id;
             var username = config.username;
 
-            if (peer_id in peers) {
-                /* This could happen if the user joins multiple channels where the other peer is also in. */
-                console.log("Already connected to peer ", peer_id);
-                return;
-            }
+            peers.forEach(peer => {
+                if (peer.peer_id === peer_id) {
+                    /* This could happen if the user joins multiple channels where the other peer is also in. */
+                    console.log("Already connected to peer ", peer_id);
+                    return;
+                }
+            });
 
             var peer_connection = new RTCPeerConnection(
                 { "iceServers": ICE_SERVERS },
@@ -92,14 +94,26 @@ function Room() {
                 // but is necessary for now to get firefox to talk to chrome .
             );
 
-            setPeers(peers => (
-                {
-                    ...peers, [peer_id]: {
-                        username: username,
-                        peer_connection: peer_connection
-                    }
-                }
-            ));
+            // setPeers(peers => 
+            //     { return [ ...peers, {peer_id: peer_id, username: username, peer_connection: peer_connection}
+            //         // ...peers, [peer_id]: {
+            //         //     username: username,
+            //         //     peer_connection: peer_connection
+            //         // }]
+            //     ]
+            //     }
+            // );
+
+            let peersList = peers;
+            let peerItem = {...peersList[peer_id]};
+            peerItem.peer_connection = peer_connection;
+            peerItem.username = username;
+            peersList[peer_id] = peerItem;
+            setPeers(peersList);
+
+
+            console.log("adding peers: peers:- ", peers)
+
 
             peer_connection.onicecandidate = function (event) {
                 if (event.candidate) {
@@ -257,7 +271,7 @@ function Room() {
         window.navigator.mediaDevices.getUserMedia({ "audio": USE_AUDIO, "video": USE_VIDEO })
             .then(function (stream) { 
                 console.log("Access granted to audio/video");
-                setLocalMediaStream(stream);
+                local_media_stream = stream;
                 document.querySelector('#local-video').srcObject = stream;
 
                 if (callback) callback();
@@ -275,6 +289,19 @@ function Room() {
         init();
         console.log("useEffect: peers:- ", peers)
     }, [])
+
+    const peerElements = peers.map((peer, index) => (
+            <div key={`${index}123`} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
+                <video id={`${index}-video`} className=' w-80 h-60' controls autoPlay>
+                    Your browser does not support the video tag.
+                </video>
+                <div>
+                    <h2 className='text-center text-secondary'>{peer.username}</h2>
+                </div>
+            </div>
+        )
+    );
+
 
     return (
         <>
@@ -296,16 +323,7 @@ function Room() {
                             <h2 className='text-center text-info'>You</h2>
                         </div>
                     </div>
-                    {peers?.map((peer, index) => (
-                        <div key={`${index}123`} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
-                            <video id={`${index}-video`} className=' w-80 h-60' controls autoPlay>
-                                Your browser does not support the video tag.
-                            </video>
-                            <div>
-                                <h2 className='text-center text-secondary'>{peer.username}</h2>
-                            </div>
-                        </div>
-                    ))}
+                    {peerElements}
                 </div>
             </div>
         </>
