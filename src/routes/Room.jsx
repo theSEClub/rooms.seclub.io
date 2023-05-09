@@ -110,6 +110,7 @@ function Room() {
             peerItem.username = username;
             peersList[peer_id] = peerItem;
             setPeers(peersList);
+            settingPeersElements();
 
             console.log("adding peers: peerid", peer_id)
             console.log("adding peers: peers:- ", peers)
@@ -290,24 +291,27 @@ function Room() {
     }, [])
 
 
+    var peerElements = <div></div>;
 
-    let peerElements = <div></div>;
+    function settingPeersElements() {
 
-    for (let peer in peers) {
-        console.log("peer:- ", peer)
-        console.log('username:- ', peers[peer].username)
-        peerElements?.push(
-            <div key={`${peer}123`} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
-                <video id={`${peer}-video`} className=' w-80 h-60' controls autoPlay>
-                    Your browser does not support the video tag.
-                </video>
-                <div>
-                    <h2 className='text-center text-secondary'>{peers[peer].username}</h2>
+        console.log("setting peer elements")
+
+        for (let peer in peers) {
+            console.log("peer:- ", peer)
+            console.log('username:- ', peers[peer].username)
+            peerElements?.push(
+                <div key={`${peer}123`} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
+                    <video id={`${peer}-video`} className=' w-80 h-60' controls autoPlay>
+                        Your browser does not support the video tag.
+                    </video>
+                    <div>
+                        <h2 className='text-center text-secondary'>{peers[peer].username}</h2>
+                    </div>
                 </div>
-            </div>
-        )
+            )
+        }
     }
-
 
     return (
         <>
