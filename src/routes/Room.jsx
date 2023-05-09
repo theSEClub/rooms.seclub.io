@@ -291,7 +291,7 @@ function Room() {
     }, [])
 
 
-    var peerElements = <div></div>;
+    var peerElements = document.createElement('div');
 
     function settingPeersElements() {
 
@@ -300,7 +300,7 @@ function Room() {
         for (let peer in peers) {
             console.log("peer:- ", peer)
             console.log('username:- ', peers[peer].username)
-            peerElements?.push(
+            peerElements?.appendChild(
                 <div key={`${peer}123`} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
                     <video id={`${peer}-video`} className=' w-80 h-60' controls autoPlay>
                         Your browser does not support the video tag.
