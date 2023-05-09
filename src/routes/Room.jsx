@@ -111,10 +111,10 @@ function Room() {
             peersList[peer_id] = peerItem;
             setPeers(peersList);
 
-            console.log("adding peers: peer id", peer_id)
+            console.log("adding peers: peerid", peer_id)
             console.log("adding peers: peers:- ", peers)
-            peers.forEach(index => {
-                console.log(index)
+            peers.forEach(peer => {
+                console.log(peer)
             });
 
 
@@ -242,7 +242,7 @@ function Room() {
 
             // remove peer from list
             setPeers(peers => {
-                peers.filter(index => index !== peer_id)
+                peers?.filter(index => index !== peer_id)
             });
 
             // delete peers[peer_id];
