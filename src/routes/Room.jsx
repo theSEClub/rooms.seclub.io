@@ -89,7 +89,7 @@ function Room() {
 
             var peer_connection = new RTCPeerConnection(
                 { "iceServers": ICE_SERVERS },
-                { "optional": [{ "DtlsSrtpKeyAgreement": true }] } 
+                { "optional": [{ "DtlsSrtpKeyAgreement": true }] }
                 // this will no longer be needed by chrome eventually (supposedly),
                 // but is necessary for now to get firefox to talk to chrome .
             );
@@ -105,7 +105,7 @@ function Room() {
             // );
 
             let peersList = peers;
-            let peerItem = {...peersList[peer_id]};
+            let peerItem = { ...peersList[peer_id] };
             peerItem.peer_connection = peer_connection;
             peerItem.username = username;
             peersList[peer_id] = peerItem;
@@ -269,7 +269,7 @@ function Room() {
         );
 
         window.navigator.mediaDevices.getUserMedia({ "audio": USE_AUDIO, "video": USE_VIDEO })
-            .then(function (stream) { 
+            .then(function (stream) {
                 console.log("Access granted to audio/video");
                 local_media_stream = stream;
                 document.querySelector('#local-video').srcObject = stream;
@@ -289,18 +289,6 @@ function Room() {
         init();
         console.log("useEffect: peers:- ", peers)
     }, [])
-
-    const peerElements = peers?.map((peer, index) => (
-            <div key={`${index}123`} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
-                <video id={`${index}-video`} className=' w-80 h-60' controls autoPlay>
-                    Your browser does not support the video tag.
-                </video>
-                <div>
-                    <h2 className='text-center text-secondary'>{peer.username}</h2>
-                </div>
-            </div>
-        )
-    );
 
 
     return (
@@ -323,7 +311,17 @@ function Room() {
                             <h2 className='text-center text-info'>You</h2>
                         </div>
                     </div>
-                    {peerElements}
+                    {peers?.map((peer, index) => (
+                        <div key={`${index}123`} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
+                            <video id={`${index}-video`} className=' w-80 h-60' controls autoPlay>
+                                Your browser does not support the video tag.
+                            </video>
+                            <div>
+                                <h2 className='text-center text-secondary'>{peer.username}</h2>
+                            </div>
+                        </div>
+                    )
+                    )}
                 </div>
             </div>
         </>
