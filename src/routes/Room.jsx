@@ -290,7 +290,7 @@ function Room() {
         console.log("useEffect: peers:- ", peers)
     }, [])
 
-    const peerElements = peers.map((peer, index) => (
+    const peerElements = peers?.map((peer, index) => (
             <div key={`${index}123`} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
                 <video id={`${index}-video`} className=' w-80 h-60' controls autoPlay>
                     Your browser does not support the video tag.
