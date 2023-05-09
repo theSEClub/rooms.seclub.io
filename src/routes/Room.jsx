@@ -63,8 +63,8 @@ function Room() {
         });
 
         function join_chat_channel(channel, userdata) {
-            console.log("join", room.id, localStorage.getItem('username'));
-            signaling_socket.emit('join', {"room_id": room.id, "username": localStorage.getItem('username')});
+            console.log("join", room, localStorage.getItem('username'));
+            signaling_socket.emit('join', {"room_id": room, "username": localStorage.getItem('username')});
         }
         function part_chat_channel(channel) {
             signaling_socket.emit('part', channel);
@@ -296,7 +296,7 @@ function Room() {
     <>
         <div className='flex flex-col items-center justify-center gap-6 w-full p-6'>
             <div className='flex items-center justify-between w-1/2'>
-                <h1 className='text-center text-2xl'>{room.id}</h1>
+                <h1 className='text-center text-2xl'>{room}</h1>
                 <Link to='/' tabIndex={'-1'}>
                     <button className='btn btn-outline btn-secondary text-primary-content'>
                         Leave Room
