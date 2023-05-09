@@ -79,13 +79,11 @@ function Room() {
             var peer_id = config.peer_id;
             var username = config.username;
 
-            peers.forEach(peer => {
-                if (peer.peer_id === peer_id) {
+            if (peer_id in peers){
                     /* This could happen if the user joins multiple channels where the other peer is also in. */
                     console.log("Already connected to peer ", peer_id);
                     return;
-                }
-            });
+            };
 
             var peer_connection = new RTCPeerConnection(
                 { "iceServers": ICE_SERVERS },
@@ -110,7 +108,6 @@ function Room() {
             peerItem.username = username;
             peersList[peer_id] = peerItem;
             setPeers(peersList);
-            settingPeersElements();
 
             console.log("adding peers: peerid", peer_id)
             console.log("adding peers: peers:- ", peers)
@@ -239,7 +236,7 @@ function Room() {
 
             // remove peer from list
             setPeers(peers => {
-                peers?.filter(index => index !== peer_id)
+                peers?.filter(peer => peer !== peer_id)
             });
 
             // delete peers[peer_id];
@@ -291,28 +288,6 @@ function Room() {
     }, [])
 
 
-    var peerElements = document.createElement('div');
-
-    function settingPeersElements() {
-
-        console.log("setting peer elements")
-
-        for (let peer in peers) {
-            console.log("peer:- ", peer)
-            console.log('username:- ', peers[peer].username)
-            peerElements?.appendChild(
-                <div key={`${peer}123`} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
-                    <video id={`${peer}-video`} className=' w-80 h-60' controls autoPlay>
-                        Your browser does not support the video tag.
-                    </video>
-                    <div>
-                        <h2 className='text-center text-secondary'>{peers[peer].username}</h2>
-                    </div>
-                </div>
-            )
-        }
-    }
-
     return (
         <>
             <div className='flex flex-col items-center justify-center gap-6 w-full p-6'>
@@ -333,7 +308,20 @@ function Room() {
                             <h2 className='text-center text-info'>You</h2>
                         </div>
                     </div>
-                    {peerElements}
+                    {
+                        peers?.map(peer => {
+                            return (
+                                <div key={`${peer}123`} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
+                                    <video id={`${peer}-video`} className=' w-80 h-60' controls autoPlay>
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div>
+                                        <h2 className='text-center text-secondary'>{peers[peer].username}</h2>
+                                    </div>
+                                </div>
+                            )
+                        })
+                    }
                 </div>
             </div>
         </>
