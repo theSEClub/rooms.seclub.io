@@ -317,13 +317,13 @@ function Room() {
                             <h2 className='text-center text-info'>You</h2>
                         </div>
                     </div>
-                    {peers?.map((peer, index) => (
+                    {peers?.map((index) => (
                         <div key={`${index}123`} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
                             <video id={`${index}-video`} className=' w-80 h-60' controls autoPlay>
                                 Your browser does not support the video tag.
                             </video>
                             <div>
-                                <h2 className='text-center text-secondary'>{peer.username}</h2>
+                                <h2 className='text-center text-secondary'>{peers[index].username}</h2>
                             </div>
                         </div>
                     )
