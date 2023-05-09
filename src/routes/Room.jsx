@@ -10,7 +10,7 @@ function Room() {
     const {id} = useParams();
     const room = id;
     // this ref is temprorary for testing
-    const anotherVideoRef = useRef(null);
+    // const anotherVideoRef = useRef(null);
 
     /** CONFIG **/
     //var SIGNALING_SERVER = "http://localhost:8080";
@@ -117,8 +117,8 @@ function Room() {
                 // $('body').append(remote_media);
                 
                 
-                anotherVideoRef.current.srcObject = event.streams[0];
-                // document.querySelector(`#${peer_id}-video`).srcObject = event.streams[0];
+                // anotherVideoRef.current.srcObject = event.streams[0];
+                document.querySelector(`#${peer_id}-video`).srcObject = event.streams[0];
             }
 
             /* Add our local stream */
@@ -314,7 +314,7 @@ function Room() {
                 </div>
                 {peers?.map((peer, index) => (
                     <div key={`${index}123`} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
-                        <video id={`${peer.peer_id}-video`} className=' w-80 h-60' controls autoPlay ref={anotherVideoRef}>
+                        <video id={`${peer.peer_id}-video`} className=' w-80 h-60' controls autoPlay>
                             Your browser does not support the video tag.
                         </video>
                         <div>
