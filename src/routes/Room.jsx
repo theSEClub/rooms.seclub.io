@@ -63,7 +63,7 @@ function Room() {
         });
 
         function join_chat_channel(channel, userdata) {
-            console.log("join", oom.id, localStorage.getItem('username'));
+            console.log("join", room.id, localStorage.getItem('username'));
             signaling_socket.emit('join', {"room_id": room.id, "username": localStorage.getItem('username')});
         }
         function part_chat_channel(channel) {
@@ -284,7 +284,7 @@ function Room() {
 
 
     useEffect(()=>{
-        console.log("info:", {roomId: room.id, roomName: room.name, username: localStorage.getItem('username')});
+        console.log(room)
         init();
         setPeers([
             // {username: "test", id: "test", stream: ""},

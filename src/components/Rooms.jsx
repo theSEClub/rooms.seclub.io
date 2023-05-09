@@ -9,7 +9,6 @@ export default function Rooms() {
     const navigate = useNavigate();
 
     const [rooms, setRooms] = useState([]);
-    const [newRoom, setNewRoom] = useState();
     const [roomName, setRoomName] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -24,6 +23,7 @@ export default function Rooms() {
     async function fetchRooms() {
         const res = await fetch('https://api.room.seclub.io:3000/api/v1/rooms');
         const data = await res.json();
+        console.log(data);
         setRooms(data);
     };
 
@@ -46,11 +46,8 @@ export default function Rooms() {
         // }          
         setError('');
         setLoading(false);
-        console.log('roomName', roomName);
 
-        setNewRoom(roomName);
         navigate(`/room/${roomName}`);
-        console.log('roomName', roomName);
 
         setRoomName('');
         closeRoomModalRef.current.click();
@@ -88,9 +85,9 @@ export default function Rooms() {
             />
         </div>
         {
-            rooms?.map(room => {
+            rooms?.map((room, index) => {
                 return (
-                    <div key={room.id} className='flex justify-between items-center gap-3 mb-6 py-3 px-8 border border-base-300 max-sm:flex-col'>
+                    <div key={`${index}468`} className='flex justify-between items-center gap-3 mb-6 py-3 px-8 border border-base-300 max-sm:flex-col'>
                         <h2 className='text-base'>{room.id}</h2>
                         <Link to={`/room/${room.id}`} tabIndex={'-1'}>
                             <button className="btn btn-outline btn-secondary">
