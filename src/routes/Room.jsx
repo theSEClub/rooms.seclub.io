@@ -1,35 +1,33 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
-import { Link, useLoaderData, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 var SIGNALING_SERVER = "wss://api.room.seclub.io:3000";
 // var signaling_socket = io(SIGNALING_SERVER);
 
 function Room() {
     
+    // get room id from url
     const {id} = useParams();
     const room = id;
-    // this ref is temprorary for testing
-    // const anotherVideoRef = useRef(null);
 
     /** CONFIG **/
-    //var SIGNALING_SERVER = "http://localhost:8080";
     var USE_AUDIO = true;
     var USE_VIDEO = true;
     var DEFAULT_CHANNEL = 'some-global-channel-name';
     var MUTE_AUDIO_BY_DEFAULT = false;
 
-    /** You should probably use a different stun server doing commercial stuff **/
+    // stun server
     /** Also see: https://gist.github.com/zziuni/3741933 **/
     var ICE_SERVERS = [
         {urls:"stun:stun.l.google.com:19302"}
     ];
+    
+    /* our own microphone / webcam */
+    var local_media_stream = null; 
 
-    // var signaling_socket = null;   /* our socket.io connection to our webserver */
-    var local_media_stream = null; /* our own microphone / webcam */
-    // var peers = {};                /* keep track of our peer connections, indexed by peer_id (aka socket.io id) */
-    const [peers, setPeers] = useState([]);                /* keep track of our peer connections, indexed by peer_id (aka socket.io id) */
-    var peer_media_elements = {};  /* keep track of our <video>/<audio> tags, indexed by peer_id */
+    /* keep track of our peer connections, indexed by peer_id (aka socket.io id) */
+    const [peers, setPeers] = useState([]);                
 
     function init() {
         console.log("Connecting to signaling server");
@@ -286,10 +284,7 @@ function Room() {
     useEffect(()=>{
         console.log(room)
         init();
-        setPeers([
-            // {username: "test", id: "test", stream: ""},
-            // {username: "test", id: "test", stream: ""},
-        ]);
+        console.log(peers)
     }, [])
 
   return (
