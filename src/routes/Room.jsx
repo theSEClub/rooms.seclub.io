@@ -113,10 +113,6 @@ function Room() {
 
             console.log("adding peers: peerid", peer_id)
             console.log("adding peers: peers:- ", peers)
-            peers.forEach(peer => {
-                console.log(peer)
-            });
-
 
             peer_connection.onicecandidate = function (event) {
                 if (event.candidate) {
@@ -291,10 +287,24 @@ function Room() {
         console.log("useEffect: room:- ", room)
         init();
         console.log("useEffect: peers:- ", peers)
-        peers.forEach((index, peer) => {
-            console.log(index, peer)
-        });
     }, [])
+
+
+
+    let peerElements = <div></div>;
+
+    for (let peer in peers) {
+        peerElements.push(
+            <div key={`${peer}123`} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
+                <video id={`${peer}-video`} className=' w-80 h-60' controls autoPlay>
+                    Your browser does not support the video tag.
+                </video>
+                <div>
+                    <h2 className='text-center text-secondary'>{peers[peer].username}</h2>
+                </div>
+            </div>
+        )
+    }
 
 
     return (
@@ -317,17 +327,7 @@ function Room() {
                             <h2 className='text-center text-info'>You</h2>
                         </div>
                     </div>
-                    {peers?.map((index) => (
-                        <div key={`${index}123`} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
-                            <video id={`${index}-video`} className=' w-80 h-60' controls autoPlay>
-                                Your browser does not support the video tag.
-                            </video>
-                            <div>
-                                <h2 className='text-center text-secondary'>{peers[index].username}</h2>
-                            </div>
-                        </div>
-                    )
-                    )}
+                    {peerElements}
                 </div>
             </div>
         </>
