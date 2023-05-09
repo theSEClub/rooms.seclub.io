@@ -58,9 +58,9 @@ function Room() {
             peer_media_elements = {};
         });
 
-        function join_chat_channel(channel, userdata) {
-            console.log("joining: ", { channel, userdata });
-            signaling_socket.emit('join', { channel, userdata });
+        function join_chat_channel(room, username) {
+            console.log("joining: ", { room, username });
+            signaling_socket.emit('join', { room_id: room, username: username });
         }
         function part_chat_channel(channel) {
             signaling_socket.emit('part', channel);
