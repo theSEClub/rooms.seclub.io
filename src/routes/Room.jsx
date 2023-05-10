@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
-import { Link, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 
 var SIGNALING_SERVER = "wss://api.room.seclub.io:3000";
 
@@ -54,7 +54,7 @@ function Room() {
                 peers[peer_id].close();
             }
 
-            setPeers({});
+            setPeers([]);
             peer_media_elements = {};
         });
 
@@ -111,6 +111,7 @@ function Room() {
 
             console.log("adding peers: peerid", peer_id)
             console.log("adding peers: peers:- ", peers)
+
 
             peer_connection.onicecandidate = function (event) {
                 if (event.candidate) {
@@ -280,6 +281,11 @@ function Room() {
             })
     }
 
+    function handleLeave() {
+        // emit disconnect
+        <Navigate to='/' />
+    }
+
 
     useEffect(() => {
         console.log("useEffect: room:- ", room)
@@ -293,11 +299,9 @@ function Room() {
             <div className='flex flex-col items-center justify-center gap-6 w-full p-6'>
                 <div className='flex items-center justify-between w-1/2'>
                     <h1 className='text-center text-2xl'>{room}</h1>
-                    <Link to='/' tabIndex={'-1'}>
-                        <button className='btn btn-outline btn-secondary text-primary-content'>
+                        <button className='btn btn-outline btn-secondary text-primary-content' onClick={()=>handleLeave()}>
                             Leave Room
                         </button>
-                    </Link>
                 </div>
                 <div className='flex justify-center items-center flex-wrap gap-6'>
                     <div className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
