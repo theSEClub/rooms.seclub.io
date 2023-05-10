@@ -106,7 +106,7 @@ function Room() {
             // peerItem.peer_connection = peer_connection;
             // peerItem.username = username;
             // peersList[peer_id] = peerItem;
-            item = {
+            const item = {
                 username: username,
                 peer_connection: peer_connection
             }
