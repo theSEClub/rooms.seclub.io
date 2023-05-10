@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 var SIGNALING_SERVER = "wss://api.room.seclub.io:3000";
 
