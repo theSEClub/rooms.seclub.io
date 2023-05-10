@@ -357,11 +357,11 @@ function Room() {
                                     {
                                         peer.peer_stream && 
                                         <>
-                                            <video id={`${peer.peer_id}-video`} className=' w-80 h-60' controls autoPlay>
+                                            <video id={peer.peer_id + "-video"} className=' w-80 h-60' controls autoPlay>
                                                 Your browser does not support the video tag.
                                             </video>
                                             <script>
-                                                document.getElementById(`${peer.peer_id}-video`).srcObject = peer.peer_stream;
+                                                document.getElementById(peer.peer_id + "-video").srcObject = peer.peer_stream;
                                             </script>
                                         </>
                                     }
