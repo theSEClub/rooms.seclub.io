@@ -30,6 +30,9 @@ function Room() {
 
 
     function init() {
+
+        var functionPeers = peers;
+
         console.log("Connecting to signaling server");
         let signaling_socket = io(SIGNALING_SERVER);
 
@@ -55,6 +58,8 @@ function Room() {
             }
 
             setPeers([]);
+            functionPeers = [];
+
             peer_media_elements = {};
         });
 
@@ -118,6 +123,7 @@ function Room() {
             setPeers(peers => {
                 return [...peers, { peer_id: peer_id, username: username, peer_connection: peer_connection }]
             });
+            functionPeers.push({ peer_id: peer_id, username: username, peer_connection: peer_connection });
 
 
             console.log("adding peers: peerid", peer_id)
@@ -178,6 +184,8 @@ function Room() {
         signaling_socket.on('sessionDescription', function (config) {
             console.log('Remote description received: ', config);
             var peer_id = config.peer_id;
+            console.log("sessionDescription peers: ", peers)
+            console.log("sessionDescription config: ", config)
             const peerObject = peers.find(peer => peer.peer_id === peer_id)
             console.log('ice candidate:', peerObject)
             var peer = peerObject.peer_connection;
@@ -224,6 +232,9 @@ function Room() {
          * can begin trying to find the best path to one another on the net.
          */
         signaling_socket.on('iceCandidate', function (config) {
+            console.log("iceCandidate peers: ", peers)
+            console.log("iceCandidate config: ", config)
+            var peer_id = config.peer_id;
             const peerObject = peers.find(peer => peer.peer_id === peer_id)
             console.log('ice candidate:', peerObject)
             var peer = peerObject.peer_connection;
