@@ -138,7 +138,7 @@ function Room() {
 
             peer_connection.ontrack = function (event) {
                 console.log("ontrack", event);
-                // document.querySelector(`#${peer_id}-video`).srcObject = event.streams[0];
+                document.querySelector(`#${peer_id}-video`).srcObject = event.streams[0];
             }
 
             /* Add our local stream */
