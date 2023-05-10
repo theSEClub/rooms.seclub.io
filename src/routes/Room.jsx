@@ -33,7 +33,7 @@ function Room() {
             const element = document.getElementById(id);
             console.log('DEPRECATED, attachMediaStream will soon be removed.');
             element.srcObject = stream;
-        }, 5000);
+        }, 1000);
             
      };
 
