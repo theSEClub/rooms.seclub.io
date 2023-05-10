@@ -79,11 +79,13 @@ function Room() {
             var peer_id = config.peer_id;
             var username = config.username;
 
-            if (peer_id in peers){
+            peers.forEach(peer => {
+                if (peer.peer_id === peer_id) {
                     /* This could happen if the user joins multiple channels where the other peer is also in. */
                     console.log("Already connected to peer ", peer_id);
                     return;
-            };
+                }
+            });
 
             var peer_connection = new RTCPeerConnection(
                 { "iceServers": ICE_SERVERS },
@@ -106,17 +108,21 @@ function Room() {
             // peerItem.peer_connection = peer_connection;
             // peerItem.username = username;
             // peersList[peer_id] = peerItem;
-            const item = {
-                username: username,
-                peer_connection: peer_connection
-            }
-            peers[peer_id] = item;
-            setPeers(peers);
+            // const item = {
+            //     username: username,
+            //     peer_connection: peer_connection
+            // }
+            // peers[peer_id] = item;
+            // setPeers(peers);
+
+            setPeers(peers => {
+                return [...peers, { peer_id: peer_id, username: username, peer_connection: peer_connection }]
+            });
+
 
             console.log("adding peers: peerid", peer_id)
             console.log("adding peers: peers:- ", peers)
             window.peers = peers;
-
 
             peer_connection.onicecandidate = function (event) {
                 if (event.candidate) {
@@ -172,7 +178,7 @@ function Room() {
         signaling_socket.on('sessionDescription', function (config) {
             console.log('Remote description received: ', config);
             var peer_id = config.peer_id;
-            var peer = peers[peer_id].peer_connection;
+            var peer = peers.find(peer => peer.peer_id === peer_id).peer_connection;
             var remote_description = config.session_description;
 
             console.log(config.session_description);
@@ -216,7 +222,7 @@ function Room() {
          * can begin trying to find the best path to one another on the net.
          */
         signaling_socket.on('iceCandidate', function (config) {
-            var peer = peers[config.peer_id].peer_connection;
+            var peer = peers.find(peer => peer.peer_id === config.peer_id).peer_connection;
             var ice_candidate = config.ice_candidate;
             console.log("adding ice candidate")
             peer.addIceCandidate(new RTCIceCandidate(ice_candidate));
@@ -236,14 +242,24 @@ function Room() {
         signaling_socket.on('removePeer', function (config) {
             console.log('Signaling server said to remove peer:', config);
             var peer_id = config.peer_id;
-            if (peer_id in peers) {
-                peers[peer_id].peer_connection.close();
-            }
+            peers.forEach(peer => {
+                if (peer.peer_id === peer_id) {
+                    peer.peer_connection.close();
+                }
+            });
+
+            // if (peer_id in peers) {
+            //     peers[peer_id].peer_connection.close();
+            // }
 
             // remove peer from list
-            setPeers(peers => {
-                peers?.filter(peer => peer !== peer_id)
-            });
+            // setPeers(peers => {
+            //     peers?.filter(peer => peer !== peer_id)
+            // });
+
+            setPeers(peer => {
+                peer?.filter(peer => peer.peer_id !== peer_id)
+            })
 
             // delete peers[peer_id];
             // delete peer_media_elements[config.peer_id];
@@ -317,7 +333,21 @@ function Room() {
                             <h2 className='text-center text-info'>You</h2>
                         </div>
                     </div>
-                    
+                    {
+                        peers?.map((peer, index) => {
+                            return (
+                                <div key={index} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
+                                    <video id={`${peer.peer_id}-video`} className=' w-80 h-60' controls autoPlay >
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div>
+                                        <h2 className='text-center text-info'>{peer.username}</h2>
+                                    </div>
+                                </div>
+                            )
+                            }
+                        )
+                    }
                 </div>
             </div>
         </>
