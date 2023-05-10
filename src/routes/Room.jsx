@@ -300,7 +300,7 @@ function Room() {
 
     useEffect(() => {
         console.log("useEffect: peers:- ", peers)
-    }, [peers])
+    })
 
 
     return (
