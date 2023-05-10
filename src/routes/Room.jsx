@@ -356,9 +356,14 @@ function Room() {
                                 <div key={index} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
                                     {
                                         peer.peer_stream && 
-                                        <video className=' w-80 h-60' controls autoPlay src={peer.peer_stream}>
-                                            Your browser does not support the video tag.
-                                        </video>
+                                        <>
+                                            <video id={`${peer.peer_id}-video`} className=' w-80 h-60' controls autoPlay>
+                                                Your browser does not support the video tag.
+                                            </video>
+                                            <script>
+                                                document.getElementById(`${peer.peer_id}-video`).srcObject = peer.peer_stream;
+                                            </script>
+                                        </>
                                     }
                                     <div>
                                         <h2 className='text-center text-secondary'>{peer.username}</h2>
