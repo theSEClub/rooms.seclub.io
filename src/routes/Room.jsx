@@ -322,7 +322,7 @@ function Room() {
                         </div>
                     </div>
                     {
-                        peers?.map(peer => {
+                        Object.keys(peers)?.map(peer => {
                             return (
                                 <div key={`${peer}123`} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
                                     <video id={`${peer}-video`} className=' w-80 h-60' controls autoPlay>
