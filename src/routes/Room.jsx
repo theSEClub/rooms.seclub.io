@@ -120,10 +120,9 @@ function Room() {
             // peers[peer_id] = item;
             // setPeers(peers);
 
-            setPeers(peers => {
-                return [...peers, { peer_id: peer_id, username: username, peer_connection: peer_connection }]
-            });
-            functionPeers.push({ peer_id: peer_id, username: username, peer_connection: peer_connection });
+            peers.push({ peer_id: peer_id, username: username, peer_connection: peer_connection });
+            setPeers(peers);
+            functionPeers = peers;
 
 
             console.log("adding peers: peerid", peer_id)
