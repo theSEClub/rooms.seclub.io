@@ -102,12 +102,16 @@ function Room() {
             //     }
             // );
 
-            let peersList = peers;
-            let peerItem = { ...peersList[peer_id] };
-            peerItem.peer_connection = peer_connection;
-            peerItem.username = username;
-            peersList[peer_id] = peerItem;
-            setPeers(peersList);
+            // let peerItem = { ...peersList[peer_id] };
+            // peerItem.peer_connection = peer_connection;
+            // peerItem.username = username;
+            // peersList[peer_id] = peerItem;
+            item = {
+                username: username,
+                peer_connection: peer_connection
+            }
+            peers[peer_id] = item;
+            setPeers(peers);
 
             console.log("adding peers: peerid", peer_id)
             console.log("adding peers: peers:- ", peers)
