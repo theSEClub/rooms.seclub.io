@@ -178,7 +178,8 @@ function Room() {
         signaling_socket.on('sessionDescription', function (config) {
             console.log('Remote description received: ', config);
             var peer_id = config.peer_id;
-            var peer = peers.find(peer => peer.peer_id === peer_id).peer_connection;
+            const peerObject = peers.find(peer => peer.peer_id === peer_id)
+            var peer = peerObject.peer_connection;
             var remote_description = config.session_description;
 
             console.log(config.session_description);
@@ -222,7 +223,8 @@ function Room() {
          * can begin trying to find the best path to one another on the net.
          */
         signaling_socket.on('iceCandidate', function (config) {
-            var peer = peers.find(peer => peer.peer_id === config.peer_id).peer_connection;
+            const peerObject = peers.find(peer => peer.peer_id === peer_id)
+            var peer = peerObject.peer_connection;
             var ice_candidate = config.ice_candidate;
             console.log("adding ice candidate")
             peer.addIceCandidate(new RTCIceCandidate(ice_candidate));
