@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
-import { Link, Navigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 var SIGNALING_SERVER = "wss://api.room.seclub.io:3000";
 
 function Room() {
+
+    const navigate = useNavigate();
 
     // get room id from url
     const { id } = useParams();
@@ -326,11 +328,15 @@ function Room() {
                 alert("You chose not to provide access to the camera/microphone, join is denied.");
                 if (errorback) errorback();
             })
+
+            window.addEventListener('leave', () => {
+                signaling_socket.emit('disconnect')
+            }) 
     }
 
     function handleLeave() {
-        // emit disconnect
-        <Navigate to='/' />
+        window.dispatchEvent(new Event('leave'));
+        navigate(`/`);
     }
 
 
