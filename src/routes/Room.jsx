@@ -179,6 +179,7 @@ function Room() {
             console.log('Remote description received: ', config);
             var peer_id = config.peer_id;
             const peerObject = peers.find(peer => peer.peer_id === peer_id)
+            console.log('ice candidate:', peerObject)
             var peer = peerObject.peer_connection;
             var remote_description = config.session_description;
 
@@ -224,6 +225,7 @@ function Room() {
          */
         signaling_socket.on('iceCandidate', function (config) {
             const peerObject = peers.find(peer => peer.peer_id === peer_id)
+            console.log('ice candidate:', peerObject)
             var peer = peerObject.peer_connection;
             var ice_candidate = config.ice_candidate;
             console.log("adding ice candidate")
