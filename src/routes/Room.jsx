@@ -293,6 +293,10 @@ function Room() {
             // delete peer_media_elements[config.peer_id];
 
         });
+        
+        window.addEventListener('leave', () => {
+            signaling_socket.emit('disconnect')
+        }) 
     }
 
     /****************************************/
@@ -329,9 +333,6 @@ function Room() {
                 if (errorback) errorback();
             })
 
-            window.addEventListener('leave', () => {
-                signaling_socket.emit('disconnect')
-            }) 
     }
 
     function handleLeave() {
