@@ -298,11 +298,7 @@ function Room() {
         console.log("useEffect: peers:- ", peers)
     }, [])
 
-    useEffect(() => {
-        console.log("useEffect: peers:- ", peers)
-    })
-
-
+    console.log("peers:- ", peers)
     return (
         <>
             <div className='flex flex-col items-center justify-center gap-6 w-full p-6'>
@@ -321,22 +317,7 @@ function Room() {
                             <h2 className='text-center text-info'>You</h2>
                         </div>
                     </div>
-                    {
-                        Object.keys(peers)?.map(peer => {
-                            console.log("anything")
-                            console.log(peers, peer)
-                            return (
-                                <div key={`${peer}123`} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
-                                    <video id={`${peer}-video`} className=' w-80 h-60' controls autoPlay>
-                                        Your browser does not support the video tag.
-                                    </video>
-                                    <div>
-                                        <h2 className='text-center text-secondary'>{peers[peer].username}</h2>
-                                    </div>
-                                </div>
-                            )
-                        })
-                    }
+                    
                 </div>
             </div>
         </>
