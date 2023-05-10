@@ -28,7 +28,7 @@ function Room() {
     /* keep track of our peer connections, indexed by peer_id (aka socket.io id) */
     const [peers, setPeers] = useState([]);
 
-    async function attachMediaStream (id, stream) {
+    function attachMediaStream (id, stream) {
         setTimeout(() => {
             const element = document.getElementById(id);
             console.log('DEPRECATED, attachMediaStream will soon be removed.');
@@ -360,7 +360,7 @@ function Room() {
                         </div>
                     </div>
                     {
-                        peers?.map(async (peer, index) => {
+                        peers?.map((peer, index) => {
                             attachMediaStream(peer.peer_id + "-video", peer.peer_stream);
                             return (
                                 <div key={index} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
