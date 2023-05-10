@@ -144,7 +144,9 @@ function Room() {
 
             peer_connection.ontrack = function (event) {
                 console.log("ontrack", event);
-                document.querySelector(`#${peer_id}-video`).srcObject = event.streams[0];
+                peers.find(peer => peer.peer_id === peer_id).peer_stream = event.streams[0];
+                setPeers(peers);
+                functionPeers = peers;
             }
 
             /* Add our local stream */
@@ -352,11 +354,14 @@ function Room() {
                         peers?.map((peer, index) => {
                             return (
                                 <div key={index} className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
-                                    <video id={`${peer.peer_id}-video`} className=' w-80 h-60' controls autoPlay >
-                                        Your browser does not support the video tag.
-                                    </video>
+                                    {
+                                        peer.peer_stream && 
+                                        <video className=' w-80 h-60' controls autoPlay src={peer.peer_stream}>
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    }
                                     <div>
-                                        <h2 className='text-center text-info'>{peer.username}</h2>
+                                        <h2 className='text-center text-secondary'>{peer.username}</h2>
                                     </div>
                                 </div>
                             )
