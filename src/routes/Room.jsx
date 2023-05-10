@@ -29,9 +29,12 @@ function Room() {
     const [peers, setPeers] = useState([]);
 
     async function attachMediaStream (id, stream) {
-        const element = document.getElementById(id);
-        console.log('DEPRECATED, attachMediaStream will soon be removed.');
-        element.srcObject = stream;
+        setTimeout(() => {
+            const element = document.getElementById(id);
+            console.log('DEPRECATED, attachMediaStream will soon be removed.');
+            element.srcObject = stream;
+        }, 5000);
+            
      };
 
 
