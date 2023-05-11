@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 var SIGNALING_SERVER = "wss://api.room.seclub.io:3000";
 
 function Room() {
-
-    const navigate = useNavigate();
 
     // get room id from url
     const { id } = useParams();
@@ -313,7 +311,6 @@ function Room() {
 
     function handleLeave() {
         window.dispatchEvent(new Event('leave'));
-        navigate(`/`);
     }
 
 
@@ -329,9 +326,12 @@ function Room() {
             <div className='flex flex-col items-center justify-center gap-6 w-full p-6'>
                 <div className='flex items-center justify-between w-1/2'>
                     <h1 className='text-center text-2xl'>{room}</h1>
+                    <a href="/">
+
                         <button className='btn btn-outline btn-secondary text-primary-content' onClick={()=>handleLeave()}>
                             Leave Room
                         </button>
+                    </a>
                 </div>
                 <div className='flex justify-center items-center flex-wrap gap-6'>
                     <div className='p-6 flex flex-col items-center justify-center gap-6 border border-base-300 '>
