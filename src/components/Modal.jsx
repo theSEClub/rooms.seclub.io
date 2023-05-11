@@ -1,6 +1,7 @@
 import React from 'react'
 
-export default function Modal({ modalName, label, inputPrompt, inputPlaceholder, inputValue, inputOnChange, handleSubmit, openModalRef, closeModalRef, error, loading }) {
+export default function Modal({ modalName, label, inputPrompt, inputPlaceholder, inputValue, inputOnChange, handleSubmit, openModalRef, closeModalRef, error }) {
+
     return (
         <>
             <label htmlFor={modalName} className="btn btn-secondary btn-outline" ref={openModalRef}>{label}</label>
@@ -33,11 +34,6 @@ export default function Modal({ modalName, label, inputPrompt, inputPlaceholder,
                                 </label>
                             }
 
-                            {loading &&
-                                <label className="label">
-                                    <span className="label-text-alt text-info">Loading...</span>
-                                </label>
-                            }
                         </div>
 
                         <button type='submit' className='btn btn-secondary'>

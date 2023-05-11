@@ -1,6 +1,4 @@
 "use client"
-// import { Moon, Rank, Sun1 } from "iconsax-react";
-// import Link from "react-router-dom";
 import { Link } from 'react-router-dom';
 import { useState } from "react";
 import { CiDark, CiLight } from 'react-icons/ci';

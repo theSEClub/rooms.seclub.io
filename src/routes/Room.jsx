@@ -27,13 +27,13 @@ function Room() {
     /* our own microphone / webcam */
     var local_media_stream = null;
 
-    /* keep track of our peer connections, indexed by peer_id (aka socket.io id) */
+    /* keep track of our peers */
     const [peers, setPeers] = useState([]);
 
     function attachMediaStream (id, stream) {
         setTimeout(() => {
             const element = document.getElementById(id);
-            console.log('DEPRECATED, attachMediaStream will soon be removed.');
+            console.log('original function is DEPRECATED,this is a custom implementation.');
             element.srcObject = stream;
         }, 1000);
             
@@ -110,35 +110,10 @@ function Room() {
                 // but is necessary for now to get firefox to talk to chrome .
             );
 
-            // setPeers(peers => 
-            //     { return [ ...peers, {peer_id: peer_id, username: username, peer_connection: peer_connection}
-            //         // ...peers, [peer_id]: {
-            //         //     username: username,
-            //         //     peer_connection: peer_connection
-            //         // }]
-            //     ]
-            //     }
-            // );
-
-            // let peerItem = { ...peersList[peer_id] };
-            // peerItem.peer_connection = peer_connection;
-            // peerItem.username = username;
-            // peersList[peer_id] = peerItem;
-            // const item = {
-            //     username: username,
-            //     peer_connection: peer_connection
-            // }
-            // peers[peer_id] = item;
-            // setPeers(peers);
-
             setPeers(peers => {
                 return [...peers, { peer_id: peer_id, username: username, peer_connection: peer_connection }]
             });
             functionPeers.push({ peer_id: peer_id, username: username, peer_connection: peer_connection });
-
-
-            console.log("adding peers: peerid", peer_id)
-            console.log("adding peers: peers:- ", peers)
             window.peers = peers;
 
             peer_connection.onicecandidate = function (event) {
@@ -297,6 +272,7 @@ function Room() {
         window.addEventListener('leave', () => {
             signaling_socket.emit('disconnect')
         }) 
+
     }
 
     /****************************************/
@@ -347,7 +323,7 @@ function Room() {
         console.log("useEffect: peers:- ", peers)
     }, [])
 
-    console.log("peers:- ", peers)
+
     return (
         <>
             <div className='flex flex-col items-center justify-center gap-6 w-full p-6'>
